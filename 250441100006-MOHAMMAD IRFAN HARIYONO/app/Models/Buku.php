@@ -8,10 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class Buku extends Model
 {
     use HasFactory;
+
     protected $table = 'bukus';
     protected $fillable = ['kategori_id', 'judul', 'penulis', 'tahun_terbit'];
-    
-    public function kategori() {
+
+    public function kategori()
+    {
         return $this->belongsTo(Kategori::class, 'kategori_id');
+    }
+
+    // Tambahkan relasi ini untuk menghitung jumlah peminjaman
+    public function peminjaman()
+    {
+        return $this->hasMany(Peminjaman::class);
     }
 }
