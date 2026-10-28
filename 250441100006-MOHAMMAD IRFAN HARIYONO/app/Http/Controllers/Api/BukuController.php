@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\BukuResource;
 use App\Http\Controllers\Controller;
 use App\Models\Buku;
 use App\Http\Requests\StoreBukuRequest;
@@ -37,7 +38,8 @@ class BukuController extends Controller
         // Pagination 10 data per halaman dengan membawa query string
         $bukus = $query->paginate(10)->appends($request->all());
 
-        return response()->json($bukus, 200);
+        // Kembalikan data paginasi yang sudah dibungkus API Resource
+        return BukuResource::collection($bukus);
     }
 
     public function store(StoreBukuRequest $request)
