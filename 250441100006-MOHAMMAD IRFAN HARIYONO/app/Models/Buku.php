@@ -11,6 +11,14 @@ class Buku extends Model
 
     protected $table = 'bukus';
     protected $fillable = ['kategori_id', 'judul', 'penulis', 'tahun_terbit'];
+    protected $appends = ['sedang_dipinjam'];
+
+    public function getSedangDipinjamAttribute()
+    {
+        return \App\Models\Peminjaman::where('buku_id', $this->id)
+            ->whereIn('status', ['Menunggu Persetujuan', 'Sedang Dipinjam'])
+            ->exists();
+    }
 
     public function kategori()
     {
