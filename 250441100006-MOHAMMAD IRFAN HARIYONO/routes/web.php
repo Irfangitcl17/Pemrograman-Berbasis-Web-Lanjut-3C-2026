@@ -5,6 +5,8 @@ use App\Models\Peminjaman;
 use App\Http\Controllers\AkunController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB; // Tambahan untuk DB::select (A2)
+use Illuminate\Http\Request;       // Tambahan untuk Request (A2)
 
 Route::redirect('/', '/login');
 
@@ -42,16 +44,35 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Menu Koleksi Buku 
     Route::get('/buku', function () {
-        return view('buku.index');
+        $bukus = \App\Models\Buku::all();
+        return view('buku.index', compact('bukus'));
     })->name('buku.index')->middleware('permission:lihat daftar buku');
 
-    //Rute Detail Buku dipindah ke sini agar semua role bisa melihat
+    // ====================================================================
+    // CELAH A2: SQL INJECTION (Membaca query string digabung langsung)
+    // ====================================================================
+    Route::get('/buku-cari', function (Request $request) {
+        $judul = $request->query('judul');
+        // VULNERABLE: String sql mentah rentan diinjeksi
+        $buku = DB::select("SELECT * FROM bukus WHERE judul = '$judul'");
+        return response()->json($buku);
+    });
+
+    // ====================================================================
+    // CELAH A3: CSRF (Rute GET untuk menghapus buku)
+    // ====================================================================
+    Route::get('/buku/{id}/hapus', function ($id) {
+        \App\Models\Buku::destroy($id);
+        return response()->json(['message' => 'Buku berhasil dihapus lewat jebakan!']);
+    });
+
+    // Rute Detail Buku
     Route::get('/buku/{id}', function ($id) {
         $buku = \App\Models\Buku::findOrFail($id);
         return view('buku.show', compact('buku'));
     })->name('buku.show');
 
-    //Rute Pengajuan Pinjam dipindah ke sini dan diganti namanya
+    // Rute Pengajuan Pinjam 
     Route::post('/ajukan-pinjam', function (\Illuminate\Http\Request $request) {
         $request->validate(['buku_id' => 'required|exists:bukus,id']);
 
@@ -95,6 +116,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         return view('peminjaman.index', compact('peminjamans', 'totalDipinjam', 'pengajuanBaru', 'pengembalianBulanIni'));
     })->name('peminjaman.index')->middleware('permission:kelola peminjaman|memproses persetujuan peminjaman');
+
+    // ====================================================================
+    // CELAH A4: IDOR (Melihat detail peminjaman tanpa cek pemilik)
+    // ====================================================================
+    Route::get('/peminjaman/{id}', function ($id) {
+        // VULNERABLE: Memanggil findOrFail tanpa memvalidasi kepemilikan siswa
+        $peminjaman = Peminjaman::findOrFail($id);
+        
+        // Menampilkan JSON agar celah langsung terlihat dengan mudah di browser
+        return response()->json($peminjaman);
+    });
 
     Route::patch('/peminjaman/{id}/setujui', function ($id) {
         $peminjaman = Peminjaman::findOrFail($id);

@@ -72,7 +72,27 @@
                             </tr>
                         </thead>
                         <tbody id="tabelBukuBody">
-                            <!-- Dimuat JavaScript -->
+                            @forelse($bukus as $buku)
+                                <tr class="border-b border-gray-100 hover:bg-gray-50">
+            
+                                    <!-- CELAH A1: Sintaks Blade tanpa escaping -->
+                                    <td class="p-3 font-medium">{!! $buku->judul !!}</td>
+            
+                                    <td class="p-3">{{ $buku->penulis }}</td>
+                                    <td class="p-3"><span class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs">Kategori</span></td>
+                                    <td class="p-3">{{ $buku->tahun_terbit }}</td>
+                                    <td class="p-3 text-center">
+                                        <a href="/buku/{{ $buku->id }}" class="inline-block bg-indigo-500 text-white px-3 py-1 rounded text-sm hover:bg-indigo-600 mb-1 mr-1">Detail</a>
+                
+                                        @unlessrole('siswa')
+                                        <!-- Tombol Hapus Rentan (Celah A3) -->
+                                        <a href="/buku/{{ $buku->id }}/hapus" class="inline-block bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 mb-1">Hapus</a>
+                                        @endunlessrole
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="5" class="text-center p-6 text-gray-500">Belum ada data buku.</td></tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
