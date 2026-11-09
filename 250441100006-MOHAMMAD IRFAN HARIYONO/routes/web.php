@@ -58,13 +58,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return response()->json($buku);
     });
 
+    Route::get('/buku/create', function () {
+        return view('buku.create');
+    })->middleware('can:kelola-buku');
+
     // ====================================================================
     // Menambal A3: Route DELETE (Menghapus metode GET yang rentan)
     // ====================================================================
     Route::delete('/buku/{id}', function ($id) {
         \App\Models\Buku::destroy($id);
         return redirect()->back();
-    })->middleware(['auth', 'role:admin|petugas']);
+    })->middleware('can:kelola-buku');
 
     // Rute Detail Buku
     Route::get('/buku/{id}', function ($id) {

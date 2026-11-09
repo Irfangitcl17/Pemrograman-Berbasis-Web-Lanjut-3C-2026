@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             
             <!-- Form Tambah/Ubah Buku HANYA TAMPIL JIKA BUKAN SISWA -->
-            @unlessrole('siswa')
+            @can('kelola-buku')
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <h3 class="text-lg font-bold mb-4" id="formTitle">Tambah Buku</h3>
@@ -49,7 +49,7 @@
                     </form>
                 </div>
             </div>
-            @endunlessrole
+            @endcan
 
             <!-- Tabel Data Buku (Dilihat oleh Semua Role) -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -84,7 +84,7 @@
                                     <td class="p-3 text-center">
                                         <a href="/buku/{{ $buku->id }}" class="inline-block bg-indigo-500 text-white px-3 py-1 rounded text-sm hover:bg-indigo-600 mb-1 mr-1">Detail</a>
                 
-                                        @unlessrole('siswa')
+                                        @can('kelola-buku')
                                         <!-- PERBAIKAN A3: Menggunakan Form DELETE & Token CSRF -->
                                         <form action="/buku/{{ $buku->id }}" method="POST" class="inline-block">
                                             @csrf
@@ -93,7 +93,7 @@
                                                 Hapus
                                             </button>
                                         </form>
-                                        @endunlessrole
+                                        @endcan
                                     </td>
                                 </tr>
                             @empty
