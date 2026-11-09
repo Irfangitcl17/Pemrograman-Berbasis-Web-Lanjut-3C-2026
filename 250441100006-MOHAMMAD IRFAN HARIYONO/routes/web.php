@@ -49,22 +49,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('buku.index')->middleware('permission:lihat daftar buku');
 
     // ====================================================================
-    // CELAH A2: SQL INJECTION (Membaca query string digabung langsung)
+    // Menambal A2: SQL INJECTION (Menggunakan Query Binding)
     // ====================================================================
     Route::get('/buku-cari', function (Request $request) {
         $judul = $request->query('judul');
-        // VULNERABLE: String sql mentah rentan diinjeksi
-        $buku = DB::select("SELECT * FROM bukus WHERE judul = '$judul'");
+        
+        $buku = \Illuminate\Support\Facades\DB::select("SELECT * FROM bukus WHERE judul = ?", [$judul]);
         return response()->json($buku);
     });
 
     // ====================================================================
-    // CELAH A3: CSRF (Rute GET untuk menghapus buku)
+    // Menambal A3: Route DELETE (Menghapus metode GET yang rentan)
     // ====================================================================
-    Route::get('/buku/{id}/hapus', function ($id) {
+    Route::delete('/buku/{id}', function ($id) {
         \App\Models\Buku::destroy($id);
-        return response()->json(['message' => 'Buku berhasil dihapus lewat jebakan!']);
-    });
+        return redirect()->back();
+    })->middleware(['auth', 'role:admin|petugas']);
 
     // Rute Detail Buku
     Route::get('/buku/{id}', function ($id) {
