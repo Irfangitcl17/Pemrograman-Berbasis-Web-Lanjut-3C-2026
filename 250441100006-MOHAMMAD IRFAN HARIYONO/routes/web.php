@@ -176,4 +176,8 @@ Route::middleware(['auth', 'role:siswa'])->group(function () {
     })->name('siswa.dashboard');
 });
 
+Route::get('/error-test', function () {
+    throw new \RuntimeException('Ini test error');
+});
+
 require __DIR__.'/auth.php';

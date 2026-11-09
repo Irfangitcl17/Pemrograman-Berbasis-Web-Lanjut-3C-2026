@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
         // 2. Buat Akun Dummy untuk Login (Modul 5)
         $admin = User::firstOrCreate(
             ['email' => 'admin@perpus.com'],
-            ['name' => 'Admin Perpus', 'password' => Hash::make('password')]
+            ['name' => 'Admin Perpus', 'password' => Hash::make('AdminRahasia123!')]
         );
         $admin->assignRole('admin');
 
