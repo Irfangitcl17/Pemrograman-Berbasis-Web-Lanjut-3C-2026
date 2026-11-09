@@ -122,11 +122,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('peminjaman.index')->middleware('permission:kelola peminjaman|memproses persetujuan peminjaman');
 
     // ====================================================================
-    // CELAH A4: IDOR (Melihat detail peminjaman tanpa cek pemilik)
+    // Menambal A4: Menambal IDOR (Menggunakan POlicy PeminjamanPolicy)
     // ====================================================================
     Route::get('/peminjaman/{id}', function ($id) {
         // VULNERABLE: Memanggil findOrFail tanpa memvalidasi kepemilikan siswa
         $peminjaman = Peminjaman::findOrFail($id);
+
+        \Illuminate\Support\Facades\Gate::authorize('view', $peminjaman);        
         
         // Menampilkan JSON agar celah langsung terlihat dengan mudah di browser
         return response()->json($peminjaman);
